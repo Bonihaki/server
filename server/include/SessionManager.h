@@ -1,4 +1,3 @@
-
 #ifndef SESSIONMANAGER_H
 #define SESSIONMANAGER_H
 
