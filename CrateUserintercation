@@ -1,0 +1,37 @@
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QObject>
+
+void createUser(const QString &username, const QString &email, const QString &password) {
+    QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+    // URL для PHP-скрипта
+    QUrl url("http://localhost:8000/create_user.php"); // Замените на ваш URL
+
+    // Установка запроса
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    // Параметры POST-запроса
+    QUrlQuery params;
+    params.addQueryItem("username", username);
+    params.addQueryItem("email", email);
+    params.addQueryItem("password", password);
+
+    // Отправка запроса
+    QNetworkReply *reply = manager->post(request, params.query().toUtf8());
+
+    QObject::connect(reply, &QNetworkReply::finished, [=]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray response = reply->readAll();
+            qDebug() << "User created successfully:" << response;
+        } else {
+            qDebug() << "Error creating user:" << reply->errorString();
+        }
+        reply->deleteLater();
+    });
+}
